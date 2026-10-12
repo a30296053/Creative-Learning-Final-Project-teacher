@@ -65,7 +65,7 @@
 ### 2. 啟動
 
 ```bash
-cp .env.example .env
+cp .env.example .env   # 選用：只有要放雲端 API key 或換模型時才需要
 docker compose up --build
 ```
 
@@ -77,8 +77,9 @@ docker compose up --build
 不使用 Docker 時：
 
 ```bash
-cd api && pip install -r requirements.txt && uvicorn app.main:app --reload
-cd ui  && pip install -r requirements.txt && streamlit run app.py
+uv sync
+uv run uvicorn app.main:app --app-dir api --reload
+uv run streamlit run ui/app.py
 ```
 
 繳交前需以 `docker compose up` 確認可執行。
@@ -105,7 +106,7 @@ cd ui  && pip install -r requirements.txt && streamlit run app.py
 ├── docs/
 │   └── midterm-report.md   # 期中報告範本
 ├── api/
-│   ├── requirements.txt
+│   ├── Dockerfile
 │   └── app/
 │       ├── main.py         # 端點
 │       ├── schemas.py      # 回傳格式，欄位名稱不得修改
@@ -127,7 +128,7 @@ cd ui  && pip install -r requirements.txt && streamlit run app.py
 3. 護欄觸發後的處理
 4. 地端／雲端路由，並回傳 `route`
 
-流程可自行改寫，回傳的 `ChatResponse` 格式需維持不變。新增套件需寫入 `api/requirements.txt`。
+流程可自行改寫，回傳的 `ChatResponse` 格式需維持不變。新增套件以 `uv add --group api <套件>`（UI 用 `--group ui`）加入，會同步更新 `pyproject.toml` 與 `uv.lock`。
 
 ## 測試
 

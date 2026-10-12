@@ -2,8 +2,16 @@
 # api 透過 host.docker.internal 連到電腦上的 Ollama。
 services:
   api:
-    build: ./api
-    env_file: .env
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    env_file:
+      - path: .env
+        required: false   # 沒有 .env 也能啟動（驗收機不會有）
+    environment:
+      # 只放「因為在 Docker 裡才需要改」的值；其他設定與預設值見 api/app/config.py
+      OLLAMA_URL: http://host.docker.internal:11434   # 容器內的 localhost 是容器自己
+      DATA_DIR: /data                                 # 對應下面 volumes 的掛載點
     extra_hosts:
       - "host.docker.internal:host-gateway"  # Linux 需要這行；Windows / Mac 本來就有
     volumes:
@@ -12,7 +20,9 @@ services:
       - "8000:8000"
 
   ui:
-    build: ./ui
+    build:
+      context: .
+      dockerfile: ui/Dockerfile
     environment:
       API_URL: http://api:8000
     ports:
