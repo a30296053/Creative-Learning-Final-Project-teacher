@@ -6,15 +6,12 @@
 唯一的要求是最後回傳的 ChatResponse 符合 spec/api-contract.md。
 """
 
-import os
 from collections import defaultdict
 
 import httpx
 
+from .config import LOCAL_MODEL, OLLAMA_URL
 from .schemas import ChatResponse, Guardrail, Source, TraceStep
-
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-LOCAL_MODEL = os.environ.get("LOCAL_MODEL", "qwen2.5:3b")
 
 # session_id → 對話歷史。重啟就會消失，有需要請自行換成持久化儲存
 _history: dict[str, list[dict]] = defaultdict(list)
