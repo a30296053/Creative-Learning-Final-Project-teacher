@@ -99,8 +99,8 @@ docker compose down
 - **compose 與 `uv run` 不能同時跑**：兩者都佔用 8000，後啟動的會出現 `address already in use`。驗證 Docker 前先停掉 `uv run`，驗完再 `docker compose down`。
 - 容器以非 root 使用者（`nonroot`，uid 999）執行，`/app` 對它是唯讀。之後若要寫入檔案（例如把 RAG 索引存到磁碟），需另外指定可寫目錄或使用 volume，不要寫進 `/app`。
 - ui 等 api 通過健康檢查（`/health`）才會啟動；`docker compose ps` 可看到 `healthy` 狀態。
-- 開發機已有 Docker（28.1.1）。`docker compose build` 與容器啟動（api `/health`、ui 健康檢查）已驗證通過。
-- ⚠️ **尚未驗證**：容器內的 api 連主機 Ollama（`host.docker.internal`）；等 `pipeline.py` 實際呼叫模型後，期中前務必用 `docker compose up` 完整跑一次。
+- 開發機已有 Docker（28.1.1）。已用 `docker compose up --build` 完整驗證（2026-10-14）：api `/health`、ui 健康檢查、`POST /chat` 經容器內 api 呼叫主機 Ollama（`qwen2.5:3b`）取得回答、多輪對話歷史、ui 容器 → api 容器 → Ollama。
+- 之後實作 RAG（嵌入模型、索引寫入磁碟）後，仍需重新用 `docker compose up --build` 完整跑一次再繳交。
 
 ## 7. 檔案架構
 
