@@ -4,13 +4,14 @@
 
 ## 1. 相對模板改了什麼
 
-| 項目       | 模板                                          | 現在                                                                 |
-| ------------ | ----------------------------------------------- | ---------------------------------------------------------------------- |
-| 套件管理   | `api/requirements.txt`、`ui/requirements.txt` | 根目錄`pyproject.toml` + `uv.lock`，依賴分 `api`、`ui` 兩個 group    |
+
+| 項目       | 模板                                          | 現在                                                                               |
+| ------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 套件管理   | `api/requirements.txt`、`ui/requirements.txt` | 根目錄`pyproject.toml` + `uv.lock`，依賴分 `api`、`ui` 兩個 group                  |
 | Dockerfile | `pip install -r requirements.txt`             | `uv sync --locked --only-group <group>`（api 或 ui），build context 為 repo 根目錄 |
-| 設定       | `pipeline.py` 內 `os.environ.get`             | 集中在`api/app/config.py`                                            |
-| `.env`     | compose 必須有                                | 選用（驗收機不會有）；只放祕密與個人偏好                             |
-| Python     | 無限制                                        | 固定 3.12（`.python-version`，與 `python:3.12-slim` 一致）           |
+| 設定       | `pipeline.py` 內 `os.environ.get`             | 集中在`api/app/config.py`                                                          |
+| `.env`     | compose 必須有                                | 選用（驗收機不會有）；只放祕密與個人偏好                                           |
+| Python     | 無限制                                        | 固定 3.12（`.python-version`，與 `python:3.12-slim` 一致）                         |
 
 ## 2. 一次說清楚：有哪些東西在跑
 
@@ -45,7 +46,7 @@ uv sync
 
 ```bash
 ollama serve                                                   # 若 Ollama 沒在背景跑
-uv run uvicorn app.main:app --app-dir api --reload             # 後端 http://localhost:8000/docs
+uv run uvicorn api.app.main:app --reload                       # 後端 http://localhost:8000/docs
 uv run streamlit run ui/app.py                                 # 前端 http://localhost:8501
 ```
 
@@ -70,6 +71,7 @@ uv add --group ui <套件>       # 前端用
 
 ## 5. 設定放哪裡
 
+
 | 設定                       | 放哪裡                                           | 例子                                        |
 | ---------------------------- | -------------------------------------------------- | --------------------------------------------- |
 | 每個人都該一致、會影響結果 | `api/app/config.py` 的預設值（會 commit）        | `TOP_K`、`RAG_VERSION`、`CHUNK_SIZE`        |
@@ -80,7 +82,7 @@ uv add --group ui <套件>       # 前端用
 
 - 專案必須在**沒有 `.env`、沒有雲端 key** 時也能以純地端模式完整運作。
 - 會影響報告數字的設定不要只放在自己的 `.env`，否則別人重現不了。
-- `uv run` 不會自動讀 `.env`；要用時：`uv run --env-file .env uvicorn app.main:app --app-dir api --reload`。
+- `uv run` 不會自動讀 `.env`；要用時：`uv run --env-file .env uvicorn api.app.main:app --reload`。
 - 換地端模型要先 `ollama pull <模型>`（Ollama 的 API 不會自動下載，找不到會回 404），驗收機也必須有該模型，並寫進 README。
 
 ## 6. 用 Docker 驗證（繳交前、改了 Dockerfile 或依賴後）
@@ -92,8 +94,13 @@ docker compose down
 ```
 
 - 容器內連主機上的 Ollama 用 `host.docker.internal`。Linux 主機的 Ollama 需對容器開放：`OLLAMA_HOST=0.0.0.0`（見 README 疑難排解）。
-- 容器內的程式碼是 build 時複製進去的，改了程式要重新 `--build`。
-- ⚠️ **目前 Docker 建置尚未實際驗證**（開發環境沒有 Docker），期中前務必在有 Docker 的機器上跑一次。
+- 容器內的程式碼是 build 時複製進去的，改了程式要重新 `--build`；只改 `docker-compose.yml` 的設定或 `data/` 教材則不用（教材是掛載進去的）。
+- **port 只綁 `127.0.0.1`**（`127.0.0.1:8000:8000`、`127.0.0.1:8501:8501`）。Docker 發佈的 port 會繞過 ufw，若綁在所有介面，實驗室伺服器上的 api 會暴露在外網。助教與組員在自己的電腦用 `localhost` 不受影響；在伺服器上開發則用 VS Code 轉發或 `ssh -L 8501:localhost:8501`。
+- **compose 與 `uv run` 不能同時跑**：兩者都佔用 8000，後啟動的會出現 `address already in use`。驗證 Docker 前先停掉 `uv run`，驗完再 `docker compose down`。
+- 容器以非 root 使用者（`nonroot`，uid 999）執行，`/app` 對它是唯讀。之後若要寫入檔案（例如把 RAG 索引存到磁碟），需另外指定可寫目錄或使用 volume，不要寫進 `/app`。
+- ui 等 api 通過健康檢查（`/health`）才會啟動；`docker compose ps` 可看到 `healthy` 狀態。
+- 開發機已有 Docker（28.1.1）。`docker compose build` 與容器啟動（api `/health`、ui 健康檢查）已驗證通過。
+- ⚠️ **尚未驗證**：容器內的 api 連主機 Ollama（`host.docker.internal`）；等 `pipeline.py` 實際呼叫模型後，期中前務必用 `docker compose up` 完整跑一次。
 
 ## 7. 檔案架構
 
