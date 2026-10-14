@@ -78,7 +78,7 @@ docker compose up --build
 
 ```bash
 uv sync
-uv run uvicorn app.main:app --app-dir api --reload
+uv run uvicorn api.app.main:app --reload
 uv run streamlit run ui/app.py
 ```
 

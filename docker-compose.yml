@@ -1,5 +1,3 @@
-# Ollama 不放在 compose 裡，請直接安裝在電腦上（https://ollama.com/download）。
-# api 透過 host.docker.internal 連到電腦上的 Ollama。
 services:
   api:
     build:
@@ -7,17 +5,22 @@ services:
       dockerfile: api/Dockerfile
     env_file:
       - path: .env
-        required: false   # 沒有 .env 也能啟動（驗收機不會有）
+        required: false
     environment:
-      # 只放「因為在 Docker 裡才需要改」的值；其他設定與預設值見 api/app/config.py
-      OLLAMA_URL: http://host.docker.internal:11434   # 容器內的 localhost 是容器自己
-      DATA_DIR: /data                                 # 對應下面 volumes 的掛載點
+      OLLAMA_URL: http://host.docker.internal:11434
+      DATA_DIR: /data
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # Linux 需要這行；Windows / Mac 本來就有
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/data:ro
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   ui:
     build:
@@ -26,6 +29,7 @@ services:
     environment:
       API_URL: http://api:8000
     ports:
-      - "8501:8501"
+      - "127.0.0.1:8501:8501"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
