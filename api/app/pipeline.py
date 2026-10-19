@@ -12,6 +12,7 @@ from collections import defaultdict
 import httpx
 
 from .schemas import ChatResponse, Guardrail, Source, TraceStep
+from .rag import retrieve_docs
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 LOCAL_MODEL = os.environ.get("LOCAL_MODEL", "qwen2.5:3b")
@@ -28,8 +29,20 @@ def check_guardrail(message: str, trace: list[TraceStep]) -> Guardrail:
 
 def retrieve(message: str, trace: list[TraceStep]) -> list[Source]:
     # TODO: 對 /data 中的教材建索引並檢索；校長組改成查詢成績資料
-    trace.append(TraceStep(step="retrieve", detail="尚未實作，無檢索結果"))
-    return []
+
+    retrieve_chunks = retrieve_docs(message, k=3, version="A")
+    # 找不到
+    if not retrieve_chunks:
+        trace.append(TraceStep(step="retrieve", detail="未找到相關資料"))
+        return []
+    sources = []
+    for chunk in retrieve_chunks:
+        sources.append(Source(id=chunk["id"], text=chunk["text"]))
+    # 紀錄
+    match_id = [s.id for s in sources]
+    trace.append(TraceStep(step="retrieve", detail=f"版本 A 檢索成功，命中段落: {', '.join(match_id)}"))
+
+    return sources
 
 
 def generate_local(messages: list[dict]) -> str:
