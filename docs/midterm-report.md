@@ -56,7 +56,7 @@ flowchart TD
 | 差異 | 索引文字就是切塊原文；純向量檢索，依 `bge-m3` 餘弦相似度取前 K 塊 | 索引文字前面加上所屬節標題（如「1-3 移項法則」）；向量排名與 BM25 排名以 RRF（常數 60）合併後取前 K 塊。回傳的 `sources` 仍是原文 |
 | 如何切換執行 | 環境變數 `RAG_VERSION=A`，例如 `RAG_VERSION=A uv run uvicorn api.app.main:app`；Docker 則在 `.env` 加一行 `RAG_VERSION=A` | 環境變數 `RAG_VERSION=B`（`api/app/config.py` 的預設值），做法同左。評測可用 `scripts/eval_retrieval.py --version A|B` |
 
-兩版共用同一套切塊、嵌入模型與生成流程，差別只在索引文字與排序方式。成績比較見第 4 節：Top-3 命中 A 22/24、B 24/24，Top-1 命中 A 20/24、B 19/24，多段題覆蓋率 A 0.58、B 0.74。差距只有 1～2 題，且 B 的 Top-1 較少是 RRF 平手造成的（第 5 節）。
+兩版共用同一套切塊、嵌入模型與生成流程，差別只在索引文字與排序方式。成績比較見第 4 節：Top-3 命中 A 22/24、B 24/24，Top-1 命中 A 20/24、B 19/24，多段題覆蓋率 A 0.58、B 0.74。差距只有 1～2 題，且 B 的 Top-1 較少是 RRF 平手造成的（第 5 節）。助教公開題 teacher-012 在 B 下未通過（第 5、6 節），選 B 為預設是取捨後的決定，理由見第 5 節。
 
 ## 4. 評測集與命中紀錄
 
@@ -109,16 +109,61 @@ flowchart TD
 | --- | --- | --- | --- | --- |
 | `my-005`「出 2 題考驗算的選擇題」；`my-006`「出 3 題像 3(x+2)-2(x-1)=15 這種含括號的選擇題」（版本 B，含節標題） | my-005：1-3-5；my-006：1-4-1 | my-005：1-5-2、1-3-5、1-2-3；my-006：1-4-3、1-4-1、1-4-4。兩題的前兩名 RRF 分數完全相同（0.03252247488101534），Top-3 有命中，但 Top-1 沒中 | 向量排名與 BM25 排名互為鏡像（一個段落向量第 1、BM25 第 2，另一個相反）時，RRF 分數同為 1/61 + 1/62，完全平手。平手時誰排前面由 `argsort` 的內部順序決定（索引大者在前），與內容好壞無關。索引只有 21 段，這種對稱很容易出現 | 已確認：印出前幾名的分數，兩者逐位相同。待做：平手時改以向量相似度為第二排序鍵，重跑 `eval_retrieval.py --version B`，預期 my-005、my-006 的 Top-1 恢復，並確認其他題的 Top-1、Top-3 沒有變差 |
 | `my-026`「幫我摘要 1-5 節的重點」（版本 A） | 1-5-1 ～ 1-5-5（第 5 節整節） | A：1-4-3、1-3-4、1-3-3，完全沒有第 5 節的段落（覆蓋 0/3）。B（含節標題）：1-4-3、1-5-1、1-3-3，只靠第 2 名勉強命中（覆蓋 1/3） | 切塊以 `###` 為單位，`##` 節標題（如「1-5 應用問題」）沒有進任何切塊，「1-5 節」在切塊文字中沒有可比對的內容；向量檢索也無法把「1-5」對應到這一節的語意 | 已確認：檢查所有切塊文字，沒有任何一行是 `##` 標題。已驗證的修正：(1) 問題含「N-N 節」時依段落 id 前綴直接取整節（`section_chunks`），teacher-010 的 `sources` 變成 1-3-1 ～ 1-3-5；(2) 版本 B 在索引文字加上節標題，多段題覆蓋率由 0.64 升到 0.74（n=12） |
+| `teacher-012`「學生解方程式時常犯哪些錯？」（助教公開題，版本 B） | 1-4-4 | B：1-1-4、1-1-3、1-1-2，1-4-4 不在前五名；對照 A：1-4-4 排第 1，測試通過 | BM25 斷詞後，問題只剩「解方」「方程」「程式」等詞能比對，而「方程式」是整份教材的主題詞，在第 1-1 節大量出現；教材 1-4-4 寫的是「常見的錯誤」，與問題的「常犯」「哪些錯」沒有相同的斷詞，BM25 幾乎給不了分。RRF 把兩份排名相加：向量排第 1、BM25 缺席的 1-4-4 約 0.016 分，低於向量第 2、BM25 第 3 的 1-1-3（約 0.032）。我們的評測集沒有這種只靠通用詞的問題（相近的 my-021 因含「去分母」而正常），這也是評測集的盲點 | 已做：印出向量排名（1-4-4 第 1）與 BM25 排名（前五名沒有 1-4-4），確認 BM25 是來源。待做：讓 BM25 忽略在過多段落都出現的詞（或降低其權重），重跑 25 題與 teacher-012，預期 teacher-012 恢復且其他題不變差。尚未修改 |
 
-上表第一列尚未修正，修正前 B 的成績為 Top-1 19/24、Top-3 24/24（對照：B 不含節標題為 21/24、23/24；A 為 20/24、22/24）。修正後的數字另列，不覆蓋此處。
+上表第一列與第三列尚未修正，第一列修正前 B 的成績為 Top-1 19/24、Top-3 24/24（對照：B 不含節標題為 21/24、23/24；A 為 20/24、22/24）。修正後的數字另列，不覆蓋此處。
+
+決定預設版本時的比較：排除由「依節號取整節」規則處理的題目（my-026、teacher-010）後，我們的 23 題加上助教公開題 2 題共 25 題，A 與 B 的 Top-3 皆為 24/25（A 未命中 my-002，B 未命中 teacher-012），Top-1 為 A 22/25、B 19/25；B 的優勢在多段題覆蓋率（0.74 對 0.58）。我們仍選 B 為預設，理由是教師情境以摘要為主，覆蓋率較重要，並如實保留 B 在 teacher-012 與 Top-1 的劣勢。
 
 ## 6. 公開測試題結果
 
-> 執行 `python scripts/run_tests.py tests/<role>.jsonl`，貼上輸出，並說明主要的失敗原因。期中不以通過率計分。
+執行環境：2026-10-24，`docker compose up --build` 啟動，commit `5f7d03c`，預設設定（`RAG_VERSION=B`、K = 3、`bge-m3`、`qwen2.5:3b`）。指令與輸出：
 
 ```
-（貼上輸出）
+uv run python scripts/run_tests.py tests/teacher.jsonl
+FAIL  teacher-001
+      questions 應有 5 題，實際為 0 題
+FAIL  teacher-002
+      questions 應有 3 題，實際為 0 題
+FAIL  teacher-003
+      questions 應有 2 題，實際為 0 題
+FAIL  teacher-004
+      questions 應有 3 題，實際為 0 題
+FAIL  teacher-005
+      questions 應有 2 題，實際為 0 題
+FAIL  teacher-006
+      guardrail.triggered 應為 True，實際為 False
+      guardrail.category 應為 'out_of_scope'，實際為 None
+      guardrail.action 應為 'refuse'，實際為 'pass'
+FAIL  teacher-007
+      guardrail.triggered 應為 True，實際為 False
+      guardrail.category 應為 'out_of_scope'，實際為 None
+      guardrail.action 應為 'refuse'，實際為 'pass'
+FAIL  teacher-008
+      guardrail.triggered 應為 True，實際為 False
+      guardrail.category 應為 'out_of_scope'，實際為 None
+      guardrail.action 應為 'refuse'，實際為 'pass'
+FAIL  teacher-009
+      guardrail.triggered 應為 True，實際為 False
+      guardrail.category 應為 'out_of_scope'，實際為 None
+      guardrail.action 應為 'refuse'，實際為 'pass'
+PASS  teacher-010
+PASS  teacher-011
+FAIL  teacher-012
+      sources 應包含其中之一：['1-4-4']，實際為 ['1-1-2', '1-1-3', '1-1-4']
+
+分層統計
+  in_scope       0/5
+  out_of_scope   0/4
+  summary        2/3
+  總計           2/12
 ```
+
+主要的失敗原因：
+- **`in_scope` 0/5（teacher-001～005）：** 出題功能尚未實作，回傳的 `questions` 是空的，所以題數不符。出題與 Fact Critic 不在期中範圍。
+- **`out_of_scope` 0/4（teacher-006～009）：** 護欄尚未實作，`guardrail` 一律回傳 `pass`，沒有拒絕。護欄不在期中範圍，期中只要求欄位存在。
+- **`summary` 2/3：** teacher-010、011 通過；teacher-012 未通過，`sources` 缺少 1-4-4，原因與驗證見第 5 節的失敗案例（版本 A 時這題是通過的）。
+- **通過不代表內容完整：** 測試只檢查 `sources` 含任一個指定段落。teacher-010 由「依節號取整節」規則處理，`sources` 涵蓋 1-3 節全部段落，但人工檢視回答時發現，3B 模型的摘要可能漏掉部分段落（例如 1-3 節的回答沒有涵蓋 1-3-5 驗算）。
 
 ## 7. AI 使用揭露
 
