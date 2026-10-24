@@ -32,9 +32,12 @@ args = parser.parse_args()
 
 with open(args.file, encoding="utf-8") as f:
     cases = [json.loads(line) for line in f if line.strip()]
+total = len(cases)
 cases = [c for c in cases if "sources_include" in c.get("expect", {})]
 
-print(f"RAG {args.version}，嵌入模型 {EMBED_MODEL}，K={args.k}，共 {len(cases)} 題\n")
+print(
+    f"RAG {args.version}，嵌入模型 {EMBED_MODEL}，K={args.k}，共 {total} 題，其中 {len(cases)} 題有標準段落可評，其餘 {total - len(cases)} 題（如範圍外）略過\n"
+)
 
 hit_k: dict[str, list[bool]] = defaultdict(list)
 hit_1: dict[str, list[bool]] = defaultdict(list)
