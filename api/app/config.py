@@ -14,7 +14,9 @@ OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 LOCAL_MODEL = os.environ.get("LOCAL_MODEL", "qwen2.5:3b")
 
 # 教材資料夾。預設是 repo 根目錄的 data/；Docker 裡 compose 會掛載到 /data
-DATA_DIR = Path(os.environ.get("DATA_DIR") or Path(__file__).resolve().parents[2] / "data")
+DATA_DIR = Path(
+    os.environ.get("DATA_DIR") or Path(__file__).resolve().parents[2] / "data"
+)
 
 # 雲端 LLM 的 key（尚未使用）。只能放 .env，不可寫進程式碼
 CLOUD_API_KEY = os.environ.get("CLOUD_API_KEY", "")
