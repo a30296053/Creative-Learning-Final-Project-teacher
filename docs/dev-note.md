@@ -135,12 +135,12 @@ flowchart TD
 
 建議順序，每步都能獨立驗證：
 
-- [x]  1. `rag/chunking.py` + 小腳本印出每個 chunk 的段落 id，確認切得對
-- [x]  2. `rag/index.py`、`rag/retrieve.py` 基本版 A，打通 `/chat` 並回傳 `sources[].id`
-- [ ]  3. 自訂評測集 ≥ 10 題（每題標示應命中的段落 id；現在 `tests/my_tests.jsonl` 只有 2 題）
-- [ ]  4. `scripts/eval_retrieval.py`：自動算兩版 Top-K 命中率
-- [ ]  5. 改良版 B（更換切塊、混合檢索或重排序），用數據比較
-- [ ]  6. 至少一個教師情境完整可用（摘要或教材問答）
+- [X]  1. `rag/chunking.py` + 小腳本印出每個 chunk 的段落 id，確認切得對
+- [X]  2. `rag/index.py`、`rag/retrieve.py` 基本版 A，打通 `/chat` 並回傳 `sources[].id`
+- [X]  3. 自訂評測集 ≥ 10 題（每題標示應命中的段落 id；現有 32 題，句型比照 `teacher.jsonl`）
+- [X]  4. `scripts/eval_retrieval.py`：自動算兩版 Top-K 命中率
+- [X]  5. 改良版 B（更換切塊、混合檢索或重排序），用數據比較
+- [X]  6. 至少一個教師情境完整可用（摘要或教材問答）
 - [ ]  7. 失敗案例 ≥ 2 個、跑 `tests/teacher.jsonl` 並附輸出、`docs/midterm-report.md`（含 AI 使用揭露）
 - [ ]  8. README 註明模型（含嵌入模型）；`docker compose up --build` 完整驗證
 - [ ]  9. `git tag midterm && git push origin midterm`，填繳交表
@@ -182,7 +182,7 @@ docker compose down
 
   所以要持久化寫入時，用**具名 volume，不要 bind mount 主機資料夾**。
 
-- 驗證狀態：2026-10-14 已用 `docker compose up --build` 完整驗證（`/health`、ui 健康檢查、`POST /chat` 經容器內 api 呼叫主機 Ollama、多輪對話）。**實作 RAG 後須重新完整驗證**。
+- 驗證狀態：2026-10-24 已用 `docker compose up --build` 驗證含 RAG 的版本（`/health`、ui 回 200、`POST /chat` 經容器內 api 呼叫主機 Ollama 的 `bge-m3` 嵌入與 `qwen2.5:3b`、依節號取整節、容器內 `RAG_VERSION=B` 檢索，執行身分 uid 999）。索引在第一次請求時才建，不影響 `start_period`。之後若改了程式或依賴，繳交前須再驗證一次。
 
 ## 7. 協作約定
 
