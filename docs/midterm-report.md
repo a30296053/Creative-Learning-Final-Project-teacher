@@ -1,7 +1,9 @@
 # 期中報告
 
 - 組別角色：教師 AI 助教
-- 組員：林祐任（GitHub：a30296053）；wangwenho（姓名、學號、GitHub 帳號待填）
+- 組員：
+  - 王文和（學號 115522069）
+  - 林祐任（學號待填，GitHub：a30296053）
 - 繳交 commit：以 `midterm` tag 指向的 commit 為準（報告本身包含在該 commit 內，無法寫入自己的 commit hash）
 
 ## 1. 系統架構
