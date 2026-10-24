@@ -11,6 +11,7 @@ from collections import defaultdict
 import httpx
 
 from .config import LOCAL_MODEL, OLLAMA_URL
+from .rag.retrieve import retrieve as rag_retrieve
 from .schemas import ChatResponse, Guardrail, Source, TraceStep
 
 # session_id → 對話歷史。重啟就會消失，有需要請自行換成持久化儲存
@@ -24,9 +25,15 @@ def check_guardrail(message: str, trace: list[TraceStep]) -> Guardrail:
 
 
 def retrieve(message: str, trace: list[TraceStep]) -> list[Source]:
-    # TODO: 對 /data 中的教材建索引並檢索；校長組改成查詢成績資料
-    trace.append(TraceStep(step="retrieve", detail="尚未實作，無檢索結果"))
-    return []
+    hits = rag_retrieve(message)
+    trace.append(
+        TraceStep(
+            step="retrieve",
+            detail=", ".join(f"{c.id}({score:.2f})" for c, score in hits),
+        )
+    )
+    # 一塊涵蓋多段時，每段各列一筆（目前一塊只有一段）
+    return [Source(id=i, text=c.text) for c, _ in hits for i in c.ids]
 
 
 def generate_local(messages: list[dict]) -> str:

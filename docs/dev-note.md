@@ -135,8 +135,8 @@ flowchart TD
 
 建議順序，每步都能獨立驗證：
 
-- [ ]  1. `rag/chunking.py` + 小腳本印出每個 chunk 的段落 id，確認切得對
-- [ ]  2. `rag/index.py`、`rag/retrieve.py` 基本版 A，打通 `/chat` 並回傳 `sources[].id`
+- [x]  1. `rag/chunking.py` + 小腳本印出每個 chunk 的段落 id，確認切得對
+- [x]  2. `rag/index.py`、`rag/retrieve.py` 基本版 A，打通 `/chat` 並回傳 `sources[].id`
 - [ ]  3. 自訂評測集 ≥ 10 題（每題標示應命中的段落 id；現在 `tests/my_tests.jsonl` 只有 2 題）
 - [ ]  4. `scripts/eval_retrieval.py`：自動算兩版 Top-K 命中率
 - [ ]  5. 改良版 B（更換切塊、混合檢索或重排序），用數據比較
