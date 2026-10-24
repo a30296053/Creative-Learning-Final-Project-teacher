@@ -29,7 +29,7 @@ def retrieve(message: str, trace: list[TraceStep]) -> list[Source]:
     trace.append(
         TraceStep(
             step="retrieve",
-            detail=", ".join(f"{c.id}({score:.2f})" for c, score in hits),
+            detail=", ".join(f"{c.id}({score:.3f})" for c, score in hits),
         )
     )
     # 一塊涵蓋多段時，每段各列一筆（目前一塊只有一段）

@@ -17,25 +17,26 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from api.app.config import EMBED_MODEL, TOP_K
+from api.app.config import EMBED_MODEL, RAG_VERSION, TOP_K
 from api.app.rag.retrieve import retrieve
 
 parser = argparse.ArgumentParser()
 parser.add_argument("file", nargs="?", default="tests/my_tests.jsonl")
 parser.add_argument("--k", type=int, default=TOP_K)
+parser.add_argument("--version", choices=["A", "B"], default=RAG_VERSION)
 args = parser.parse_args()
 
 with open(args.file, encoding="utf-8") as f:
     cases = [json.loads(line) for line in f if line.strip()]
 cases = [c for c in cases if "sources_include" in c.get("expect", {})]
 
-print(f"嵌入模型 {EMBED_MODEL}，K={args.k}，共 {len(cases)} 題\n")
+print(f"RAG {args.version}，嵌入模型 {EMBED_MODEL}，K={args.k}，共 {len(cases)} 題\n")
 
 hit_k: dict[str, list[bool]] = defaultdict(list)
 hit_1: dict[str, list[bool]] = defaultdict(list)
 for case in cases:
     want = set(case["expect"]["sources_include"])
-    hits = [list(c.ids) for c, _ in retrieve(case["turns"][-1], args.k)]
+    hits = [list(c.ids) for c, _ in retrieve(case["turns"][-1], args.k, args.version)]
     ok_k = any(want & set(ids) for ids in hits)
     ok_1 = bool(want & set(hits[0]))
     for tier in (case.get("tier", "-"), "總計"):

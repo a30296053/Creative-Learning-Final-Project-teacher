@@ -24,3 +24,5 @@ CLOUD_API_KEY = os.environ.get("CLOUD_API_KEY", "")
 # RAG。這兩個會影響報告數字，預設值要 commit，不要只放在自己的 .env
 EMBED_MODEL = os.environ.get("EMBED_MODEL", "bge-m3")  # 走 Ollama，需先 ollama pull
 TOP_K = int(os.environ.get("TOP_K", "3"))
+# "A" = 純向量檢索（基本版）；"B" = 向量 + BM25，以 RRF 合併（改良版）
+RAG_VERSION = os.environ.get("RAG_VERSION", "A")
