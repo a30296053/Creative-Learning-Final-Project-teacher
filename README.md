@@ -116,19 +116,24 @@ uv run streamlit run ui/app.py
 │   └── referral.md         # 家長組轉介資源清單
 ├── tests/
 │   ├── <role>.jsonl        # 各角色公開測試題
-│   └── my_tests.jsonl      # 自訂測試案例
+│   └── my_tests.jsonl      # 自訂測試案例（教師組 30 題）
 ├── docs/
-│   └── midterm-report.md   # 期中報告範本
+│   ├── dev-note.md         # 本組開發筆記（架構、設定、已知問題）
+│   └── midterm-report.md   # 期中報告
 ├── api/
 │   ├── Dockerfile
 │   └── app/
 │       ├── main.py         # 端點
 │       ├── schemas.py      # 回傳格式，欄位名稱不得修改
-│       └── pipeline.py     # 主要實作位置
+│       ├── config.py       # 所有設定與預設值
+│       ├── pipeline.py     # 主要實作位置（流程調度）
+│       └── rag/            # 切塊、索引、檢索（教師組）
 ├── ui/
 │   └── app.py              # Streamlit，含兩個必備區塊
 ├── scripts/
-│   └── run_tests.py        # 測試程式
+│   ├── run_tests.py        # 測試程式
+│   ├── eval_retrieval.py   # 只測檢索命中率（教師組）
+│   └── show_chunks.py      # 印出切塊結果（教師組）
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -150,6 +155,8 @@ uv run streamlit run ui/app.py
 python scripts/run_tests.py tests/my_tests.jsonl
 python scripts/run_tests.py tests/<role>.jsonl
 ```
+
+教師組另有只測檢索的 `scripts/eval_retrieval.py`，詳見 [docs/dev-note.md](docs/dev-note.md)。
 
 ## 聯絡
 
