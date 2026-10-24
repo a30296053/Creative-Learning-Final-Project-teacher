@@ -60,7 +60,7 @@
 | 嵌入（RAG 檢索） | `bge-m3` | `ollama pull bge-m3` | 約 1.2 GB |
 
 - 兩個模型皆透過主機的 Ollama 呼叫，不放進 Docker。
-- 檢索有兩個版本，由環境變數 `RAG_VERSION` 切換（預設 `B`）：`A` 為純向量檢索，`B` 為加上節標題的向量檢索加 BM25，以 RRF 合併。例如 `RAG_VERSION=B uv run uvicorn api.app.main:app`。
+- 檢索有兩個版本，由環境變數 `RAG_VERSION` 切換（預設 `B`）：`A` 為純向量檢索，`B` 為加上節標題的向量檢索加 BM25，以 RRF 合併，並保證向量第 1 名進入 Top-K。例如 `RAG_VERSION=B uv run uvicorn api.app.main:app`。
 - 其他會影響結果的預設值（`TOP_K`、`LLM_TEMPERATURE`）寫在 `api/app/config.py`。
 
 ## 安裝

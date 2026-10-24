@@ -39,7 +39,7 @@ uv run uvicorn api.app.main:app --reload    # 後端 http://localhost:8000/docs
 uv run streamlit run ui/app.py              # 前端 http://localhost:8501
 
 # 測試（run_tests.py 需要 api 已啟動）
-uv run python scripts/run_tests.py tests/teacher.jsonl     # 助教公開題；出題、護欄尚未實作，期中預期 2/12
+uv run python scripts/run_tests.py tests/teacher.jsonl     # 助教公開題；出題、護欄尚未實作，期中預期 3/12（摘要 3 題全過）
 uv run python scripts/run_tests.py tests/my_tests.jsonl    # 自訂 30 題，同樣含出題與範圍外題，那兩類在期末功能完成前會失敗
 uv run python scripts/eval_retrieval.py --version B        # 只測檢索命中率（不經 LLM、不需啟動 api），--version A|B、--k N
 uv run python scripts/show_chunks.py -v                    # 印出切塊結果，確認段落 id 切得對
@@ -132,7 +132,7 @@ flowchart TD
 
 上圖是**期末目標**流程。期中已實作的是「檢索 → 生成」；另外在檢索之前有一條規則：問題含「N-N 節」就直接取該節所有段落。
 
-版本 A（純向量）與 B（節標題 + 向量 + BM25，以 RRF 合併）各自獨立、由 `RAG_VERSION` 切換（預設 B），才能公平比較命中率（期中 30 分的部分）。成績與取捨見 `docs/midterm-report.md` 第 3～5 節。
+版本 A（純向量）與 B（節標題 + 向量 + BM25 以 RRF 合併，並保證向量第 1 名進入 Top-K）各自獨立、由 `RAG_VERSION` 切換（預設 B），才能公平比較命中率（期中 30 分的部分）。成績與取捨見 `docs/midterm-report.md` 第 3～5 節。
 
 ### RAG 索引的存放（已決定）
 
@@ -197,7 +197,7 @@ docker compose down
 
 ## 7. 已知問題與期末待辦
 
-- **`teacher-012` 在版本 B 沒過**：BM25 被通用詞「方程式」拉走，RRF 又偏好兩邊都有排名的段落（報告第 5 節）。可能的修法：讓 BM25 忽略太常見的詞，修完要重跑評測並如實記錄前後數字。
+- **BM25 仍會被通用詞帶偏**：`teacher-012` 曾因此在版本 B 失敗，現在用「保證向量第 1 名進入 Top-K」補救（報告第 5 節，比較過 5 種做法）。但這只是讓 1-4-4 進入 Top-3（排第 3），BM25 本身的問題沒有解決；忽略高頻詞、調降 BM25 權重都試過，會換來別題失敗。
 - **RRF 分數平手**：兩個排名互為鏡像時分數完全相同，次序由 `argsort` 決定（報告第 5 節）。可能的修法：平手時以向量相似度為第二排序鍵。
 - **「N-N 節」規則只認這一種寫法**：「第三節」「1.3 節」不會觸發，會退回一般檢索。
 - **3B 模型的限制**：摘要可能漏段落、偶爾補上教材沒有的推測句，prompt 要求的行內 `[id]` 引用也常被忽略。
