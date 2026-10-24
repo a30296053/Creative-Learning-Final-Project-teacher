@@ -4,11 +4,16 @@
 - B（改良版）：向量排名與 BM25 排名以 RRF 合併，取分數最高的 K 塊。
 """
 
+import re
+
 import numpy as np
 
 from ..config import RAG_VERSION, TOP_K
 from .chunking import Chunk
 from .index import embed, get_index, tokenize
+
+# 「摘要 1-3 節」這類明確的節號：切塊內容裡沒有節標題可比對，直接依段落 id 前綴取整節
+_SECTION_REF = re.compile(r"(?<![\d-])(\d+-\d+)\s*節")
 
 RRF_K = 60  # RRF 的常用常數；越大，名次差異的影響越小
 
@@ -38,3 +43,12 @@ def retrieve(
 
     top = _ranking(scores)[:k]
     return [(index.chunks[i], float(scores[i])) for i in top]
+
+
+def section_chunks(query: str) -> list[Chunk]:
+    """問題中提到「N-N 節」時，回傳該節所有切塊；沒提到或查無此節則回傳空 list。"""
+    m = _SECTION_REF.search(query)
+    if not m:
+        return []
+    prefix = m.group(1) + "-"
+    return [c for c in get_index().chunks if c.id.startswith(prefix)]

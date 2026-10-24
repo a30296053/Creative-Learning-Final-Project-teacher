@@ -12,6 +12,8 @@ from pathlib import Path
 # 地端模型（Ollama）。容器內的 localhost 是容器自己，所以 Docker 裡要改成 host.docker.internal
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 LOCAL_MODEL = os.environ.get("LOCAL_MODEL", "qwen2.5:3b")
+# 低溫度讓回答緊貼參考資料，也讓同一題的結果比較穩定
+LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", "0.2"))
 
 # 教材資料夾。預設是 repo 根目錄的 data/；Docker 裡 compose 會掛載到 /data
 DATA_DIR = Path(
