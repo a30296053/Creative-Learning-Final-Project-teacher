@@ -1,2 +1,17 @@
 {"id": "example-001", "tier": "smoke", "turns": ["你好"], "expect": {"guardrail.triggered": false}}
 {"id": "example-002", "tier": "smoke", "turns": ["我叫小明", "我剛剛說我叫什麼？"], "expect": {"answer_contains_any": ["小明"]}}
+{"id": "ret-001", "tier": "direct", "turns": ["什麼是一元一次方程式？"], "expect": {"sources_include": ["1-1-3"]}}
+{"id": "ret-002", "tier": "paraphrase", "turns": ["5 + 3 = 8 算方程式嗎？"], "expect": {"sources_include": ["1-1-2"]}}
+{"id": "ret-003", "tier": "paraphrase", "turns": ["x² + 1 = 5 算一元一次方程式嗎？"], "expect": {"sources_include": ["1-1-3"]}}
+{"id": "ret-004", "tier": "direct", "turns": ["等量乘除公理有什麼要注意的？"], "expect": {"sources_include": ["1-2-2"]}}
+{"id": "ret-005", "tier": "paraphrase", "turns": ["為什麼等號兩邊同時加上同一個數，等式還是成立？"], "expect": {"sources_include": ["1-2-1"]}}
+{"id": "ret-006", "tier": "paraphrase", "turns": ["移項時，加號的項移到另一邊會變成什麼？"], "expect": {"sources_include": ["1-3-1"]}}
+{"id": "ret-007", "tier": "example", "turns": ["5x − 3 = 2x + 9 要怎麼解？"], "expect": {"sources_include": ["1-3-4"]}}
+{"id": "ret-008", "tier": "paraphrase", "turns": ["解完方程式後，要怎麼確認答案對不對？"], "expect": {"sources_include": ["1-3-5"]}}
+{"id": "ret-009", "tier": "example", "turns": ["x/2 + x/3 = 10 要怎麼去分母？"], "expect": {"sources_include": ["1-4-2"]}}
+{"id": "ret-010", "tier": "hard", "turns": ["x/2 + 1 = 5 常見的錯誤寫法是什麼？"], "expect": {"sources_include": ["1-4-4"]}}
+{"id": "ret-011", "tier": "hard", "turns": ["括號前面是負號，展開時要注意什麼？"], "expect": {"sources_include": ["1-4-4", "1-4-1"]}}
+{"id": "ret-012", "tier": "paraphrase", "turns": ["小明走路和騎腳踏車去學校差 10 分鐘，怎麼求距離？"], "expect": {"sources_include": ["1-5-5"]}}
+{"id": "ret-013", "tier": "paraphrase", "turns": ["解應用問題通常分哪幾個步驟？"], "expect": {"sources_include": ["1-5-1"]}}
+{"id": "ret-014", "tier": "hard", "turns": ["籠子裡雞和兔子共 20 隻、腳共 56 隻，兔子有幾隻？"], "expect": {"sources_include": ["1-5-4"]}}
+{"id": "ret-015", "tier": "multi", "turns": ["為什麼移項要變號？跟等量公理有什麼關係？"], "expect": {"sources_include": ["1-3-1", "1-2-1"]}}
