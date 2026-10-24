@@ -1,7 +1,8 @@
 """檢索。由 config.RAG_VERSION 切換：
 
 - A（基本版）：純向量檢索，取餘弦相似度最高的 K 塊。
-- B（改良版）：切塊的索引文字加上節標題，向量排名與 BM25 排名以 RRF 合併，取分數最高的 K 塊。
+- B（改良版）：切塊的索引文字加上節標題，向量排名與 BM25 排名以 RRF 合併，取分數最高的 K 塊；
+  若向量檢索的第 1 名沒有進入 Top-K，用它取代最後一塊。
 """
 
 import re
@@ -42,6 +43,11 @@ def retrieve(
         raise ValueError(f"未知的 RAG_VERSION：{version!r}（應為 A 或 B）")
 
     top = _ranking(scores)[:k]
+    if version == "B" and k > 1:
+        # BM25 只能比對字面，通用詞（如「方程式」）會把它帶偏；向量檢索的第 1 名不該因此被擠出 Top-K
+        best_dense = _ranking(dense)[0]
+        if best_dense not in top:
+            top = top[: k - 1] + [best_dense]
     return [(index.chunks[i], float(scores[i])) for i in top]
 
 
