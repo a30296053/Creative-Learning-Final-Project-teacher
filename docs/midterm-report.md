@@ -8,16 +8,34 @@
 
 ## 1. 系統架構
 
-> 一張圖即可。標出切塊、索引、檢索、生成各在哪裡，以及哪條路徑走地端模型。
-> 可以用 Mermaid 直接畫，GitHub 會自動顯示成圖，例如：
-
 ```mermaid
-flowchart LR
-    Q[使用者問題] --> R[檢索]
-    I[(索引)] --> R
-    R --> G[生成：Ollama 地端模型]
-    G --> A[回覆 + sources]
+flowchart TD
+    subgraph build["建索引（第一次請求時執行，索引存在記憶體）"]
+        D["教材<br/>data/textbook/*.md"] --> C["切塊<br/>依 ### 段落 id，記錄所屬 ## 節標題"]
+        C --> E["嵌入<br/>Ollama bge-m3（地端）"]
+        C --> BM["BM25 索引<br/>（版本 B 使用）"]
+        E --> IDX[("記憶體索引")]
+        BM --> IDX
+    end
+
+    subgraph serve["回答請求"]
+        U["使用者 / ui / run_tests.py"] -->|POST /chat| G["護欄<br/>（期中固定 pass）"]
+        G --> S{"問題含<br/>「N-N 節」？"}
+        S -->|是| W["依段落 id 前綴<br/>取整節"]
+        S -->|否| R["檢索 Top-K（K = 3）<br/>A：向量　B：向量 + BM25，RRF 合併"]
+        IDX --> R
+        W --> P["組 prompt<br/>只依據參考資料回答"]
+        R --> P
+        P --> L["生成<br/>Ollama qwen2.5:3b（地端）"]
+        L --> A["ChatResponse<br/>answer、sources、trace、route = local"]
+    end
 ```
+
+- **切塊、索引：** 在 `api/app/rag/chunking.py`、`index.py`。服務啟動後第一次請求才建索引，不寫檔案、不用向量資料庫。
+- **檢索：** `api/app/rag/retrieve.py`，由 `RAG_VERSION` 切換 A 或 B；查詢也用 `bge-m3` 嵌入。「N-N 節」的整節取用（`section_chunks`）在檢索之前判斷，不屬於 A 或 B。
+- **生成：** `api/app/pipeline.py` 組 prompt 後呼叫主機上的 Ollama `qwen2.5:3b`。
+- **走地端模型的路徑：** 嵌入（`bge-m3`）與生成（`qwen2.5:3b`）都經由主機的 Ollama，目前沒有雲端路徑，所以 `route` 固定為 `local`。
+- **部署：** `docker compose` 啟動 `ui`（Streamlit，只負責顯示）與 `api`（FastAPI，所有邏輯）；容器內以 `host.docker.internal:11434` 連主機的 Ollama，教材以唯讀方式掛載到 `/data`。
 
 ## 2. 設計決定與理由
 
