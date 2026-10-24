@@ -50,6 +50,19 @@
 3. **API key**：置於 `.env`，不得 commit。repo 中僅放 `.env.example`。key 若曾 push 至 GitHub，需立即至服務商撤銷。
 4. **資料**：使用 `data/` 與 `tests/` 中助教提供的資料。
 
+## 本組使用的模型（教師 AI 助教）
+
+驗收機需先以 `ollama pull` 安裝下列兩個模型，兩者都在 3B 以下：
+
+| 用途 | 模型 | 指令 | 大小 |
+| --- | --- | --- | --- |
+| 生成（地端） | `qwen2.5:3b` | `ollama pull qwen2.5:3b` | 約 2 GB |
+| 嵌入（RAG 檢索） | `bge-m3` | `ollama pull bge-m3` | 約 1.2 GB |
+
+- 兩個模型皆透過主機的 Ollama 呼叫，不放進 Docker。
+- 檢索有兩個版本，由環境變數 `RAG_VERSION` 切換（預設 `B`）：`A` 為純向量檢索，`B` 為加上節標題的向量檢索加 BM25，以 RRF 合併，並保證向量第 1 名進入 Top-K。例如 `RAG_VERSION=B uv run uvicorn api.app.main:app`。
+- 其他會影響結果的預設值（`TOP_K`、`LLM_TEMPERATURE`）寫在 `api/app/config.py`。
+
 ## 安裝
 
 ### 1. Ollama
@@ -58,6 +71,7 @@
 2. 下載模型：
    ```bash
    ollama pull qwen2.5:3b      # 約 2 GB
+   ollama pull bge-m3          # 約 1.2 GB，嵌入模型（RAG 檢索必要）
    ollama pull qwen2.5:1.5b    # 約 1 GB，記憶體 8 GB 以下適用；需同時修改 .env 的 LOCAL_MODEL
    ```
 3. 測試：`ollama run qwen2.5:3b "你好"`
@@ -65,7 +79,7 @@
 ### 2. 啟動
 
 ```bash
-cp .env.example .env
+cp .env.example .env   # 選用：只有要放雲端 API key 或換模型時才需要
 docker compose up --build
 ```
 
@@ -77,8 +91,9 @@ docker compose up --build
 不使用 Docker 時：
 
 ```bash
-cd api && pip install -r requirements.txt && uvicorn app.main:app --reload
-cd ui  && pip install -r requirements.txt && streamlit run app.py
+uv sync
+uv run uvicorn api.app.main:app --reload
+uv run streamlit run ui/app.py
 ```
 
 繳交前需以 `docker compose up` 確認可執行。
@@ -101,19 +116,24 @@ cd ui  && pip install -r requirements.txt && streamlit run app.py
 │   └── referral.md         # 家長組轉介資源清單
 ├── tests/
 │   ├── <role>.jsonl        # 各角色公開測試題
-│   └── my_tests.jsonl      # 自訂測試案例
+│   └── my_tests.jsonl      # 自訂測試案例（教師組 30 題）
 ├── docs/
-│   └── midterm-report.md   # 期中報告範本
+│   ├── dev-note.md         # 本組開發筆記（架構、設定、已知問題）
+│   └── midterm-report.md   # 期中報告
 ├── api/
-│   ├── requirements.txt
+│   ├── Dockerfile
 │   └── app/
 │       ├── main.py         # 端點
 │       ├── schemas.py      # 回傳格式，欄位名稱不得修改
-│       └── pipeline.py     # 主要實作位置
+│       ├── config.py       # 所有設定與預設值
+│       ├── pipeline.py     # 主要實作位置（流程調度）
+│       └── rag/            # 切塊、索引、檢索（教師組）
 ├── ui/
 │   └── app.py              # Streamlit，含兩個必備區塊
 ├── scripts/
-│   └── run_tests.py        # 測試程式
+│   ├── run_tests.py        # 測試程式
+│   ├── eval_retrieval.py   # 只測檢索命中率（教師組）
+│   └── show_chunks.py      # 印出切塊結果（教師組）
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -127,7 +147,7 @@ cd ui  && pip install -r requirements.txt && streamlit run app.py
 3. 護欄觸發後的處理
 4. 地端／雲端路由，並回傳 `route`
 
-流程可自行改寫，回傳的 `ChatResponse` 格式需維持不變。新增套件需寫入 `api/requirements.txt`。
+流程可自行改寫，回傳的 `ChatResponse` 格式需維持不變。新增套件以 `uv add --group api <套件>`（UI 用 `--group ui`）加入，會同步更新 `pyproject.toml` 與 `uv.lock`。
 
 ## 測試
 
@@ -135,6 +155,8 @@ cd ui  && pip install -r requirements.txt && streamlit run app.py
 python scripts/run_tests.py tests/my_tests.jsonl
 python scripts/run_tests.py tests/<role>.jsonl
 ```
+
+教師組另有只測檢索的 `scripts/eval_retrieval.py`，詳見 [docs/dev-note.md](docs/dev-note.md)。
 
 ## 聯絡
 

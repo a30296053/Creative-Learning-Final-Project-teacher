@@ -1,0 +1,28 @@
+[project]
+name = "creative-learning-final-project-teacher"
+version = "0.1.0"
+description = "A project for the Creative Learning Final Project for teachers."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
+
+[tool.uv]
+package = false
+default-groups = ["api", "ui"]
+
+[dependency-groups]
+api = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "httpx>=0.27",
+    "numpy>=2.5.4",
+    "rank-bm25>=0.2.2",
+]
+dev = ["ruff>=0.17.0"]
+ui = ["streamlit>=1.35", "httpx>=0.27"]
