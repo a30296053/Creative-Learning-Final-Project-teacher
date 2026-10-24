@@ -30,3 +30,5 @@
 {"id": "my-028", "tier": "teaching", "turns": ["雞兔同籠要怎麼教學生設未知數、列式？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-5-4"]}}
 {"id": "my-029", "tier": "teaching", "turns": ["括號前面是負號，學生展開時常犯什麼錯？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-4-4"]}}
 {"id": "my-030", "tier": "teaching", "turns": ["行程問題要怎麼教學生列式？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-5-5"]}}
+{"id": "my-031", "tier": "summary", "turns": ["摘要移項法則那一節的重點"], "expect": {"guardrail.action": "pass", "sources_include": ["1-3-1", "1-3-2", "1-3-3", "1-3-4", "1-3-5"]}}
+{"id": "my-032", "tier": "summary", "turns": ["整理含括號與分數的方程式這一節"], "expect": {"guardrail.action": "pass", "sources_include": ["1-4-1", "1-4-2", "1-4-3", "1-4-4"]}}

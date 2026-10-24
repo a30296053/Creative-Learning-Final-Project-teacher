@@ -1,7 +1,7 @@
 """檢索。由 config.RAG_VERSION 切換：
 
 - A（基本版）：純向量檢索，取餘弦相似度最高的 K 塊。
-- B（改良版）：向量排名與 BM25 排名以 RRF 合併，取分數最高的 K 塊。
+- B（改良版）：切塊的索引文字加上節標題，向量排名與 BM25 排名以 RRF 合併，取分數最高的 K 塊。
 """
 
 import re
@@ -26,7 +26,7 @@ def _ranking(scores: np.ndarray, *, skip_zero: bool = False) -> list[int]:
 def retrieve(
     query: str, k: int = TOP_K, version: str = RAG_VERSION
 ) -> list[tuple[Chunk, float]]:
-    index = get_index()
+    index = get_index(with_section=version == "B")
     dense = index.vectors @ embed([query])[0]
 
     if version == "A":

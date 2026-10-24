@@ -50,12 +50,12 @@ def embed(texts: list[str]) -> np.ndarray:
     return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
 
 
-@lru_cache(maxsize=1)
-def get_index() -> Index:
-    """第一次呼叫時建立，之後重複使用。"""
+@lru_cache(maxsize=2)
+def get_index(with_section: bool = False) -> Index:
+    """第一次呼叫時建立，之後重複使用。
+
+    with_section=True 時，嵌入與 BM25 用的文字前面加上節標題（改良版 B）。
+    """
     chunks = load_chunks()
-    return Index(
-        chunks,
-        embed([c.text for c in chunks]),
-        BM25Okapi([tokenize(c.text) for c in chunks]),
-    )
+    texts = [c.index_text if with_section else c.text for c in chunks]
+    return Index(chunks, embed(texts), BM25Okapi([tokenize(t) for t in texts]))
