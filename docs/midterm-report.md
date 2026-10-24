@@ -169,4 +169,8 @@ FAIL  teacher-012
 
 | 用在哪裡 | 使用的工具 | 用途 | 查核方式 |
 | --- | --- | --- | --- |
-| | | | |
+| 模型選擇 | Claude Code | 比較嵌入模型（`bge-m3`、`nomic-embed-text`、`qwen3-embedding`）的差異並提出建議；說明 3B 限制下生成模型的選擇 | 上網查證模型規格與使用方式，檢視 Claude Code 的說法；再請 Claude Code 重新稽核 |
+| 專案架構決策 | Claude Code | 討論並設計 RAG 管線：切塊方式、索引放記憶體而非向量資料庫、混合檢索（BM25 + RRF）、依節號取整節的規則、K 值與預設版本的取捨 | 上網查證 BM25、RRF、向量資料庫等說法；請 Claude Code 重新稽核；決策另以 `scripts/eval_retrieval.py` 的實測數字檢視 |
+| 程式實作 | Claude Code | 撰寫 `api/app/rag/`、`pipeline.py` 的檢索與生成流程、`scripts/show_chunks.py`、`scripts/eval_retrieval.py` | 請 Claude Code 重新稽核；實際執行評測腳本、公開測試與 `docker compose` 驗證 |
+| 測試 | Claude Code | 擬定評測集題目與「應命中」的段落 id（`tests/my_tests.jsonl`），設計評測指標（Top-K 命中率、多段題覆蓋率） | 作者審閱題目清單後採用；上網查證評測概念；請 Claude Code 重新稽核；標註先於檢索結果寫成，不因結果回頭修改 |
+| 文檔撰寫 | Claude Code | 撰寫本報告、`docs/dev-note.md`、`README.md` 的草稿 | 上網查證技術說法；請 Claude Code 重新稽核；第 4 節的表格與數字由腳本產生，可用 `eval_retrieval.py` 重現 |
