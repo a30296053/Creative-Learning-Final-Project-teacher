@@ -137,7 +137,7 @@ flowchart TD
 
 - [X]  1. `rag/chunking.py` + 小腳本印出每個 chunk 的段落 id，確認切得對
 - [X]  2. `rag/index.py`、`rag/retrieve.py` 基本版 A，打通 `/chat` 並回傳 `sources[].id`
-- [X]  3. 自訂評測集 ≥ 10 題（每題標示應命中的段落 id；現有 32 題，句型比照 `teacher.jsonl`）
+- [X]  3. 自訂評測集 ≥ 10 題（每題標示應命中的段落 id；現有 30 題（24 題可評檢索，6 題範圍外題留給護欄），句型比照 `teacher.jsonl`）
 - [X]  4. `scripts/eval_retrieval.py`：自動算兩版 Top-K 命中率
 - [X]  5. 改良版 B（更換切塊、混合檢索或重排序），用數據比較
 - [X]  6. 至少一個教師情境完整可用（摘要或教材問答）
