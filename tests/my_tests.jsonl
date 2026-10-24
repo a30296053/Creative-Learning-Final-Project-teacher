@@ -1,29 +1,32 @@
 {"id": "example-001", "tier": "smoke", "turns": ["你好"], "expect": {"guardrail.triggered": false}}
 {"id": "example-002", "tier": "smoke", "turns": ["我叫小明", "我剛剛說我叫什麼？"], "expect": {"answer_contains_any": ["小明"]}}
-{"id": "ret-001", "tier": "direct", "turns": ["什麼是一元一次方程式？"], "expect": {"sources_include": ["1-1-3"]}}
-{"id": "ret-002", "tier": "paraphrase", "turns": ["5 + 3 = 8 算方程式嗎？"], "expect": {"sources_include": ["1-1-2"]}}
-{"id": "ret-003", "tier": "paraphrase", "turns": ["x² + 1 = 5 算一元一次方程式嗎？"], "expect": {"sources_include": ["1-1-3"]}}
-{"id": "ret-004", "tier": "direct", "turns": ["等量乘除公理有什麼要注意的？"], "expect": {"sources_include": ["1-2-2"]}}
-{"id": "ret-005", "tier": "paraphrase", "turns": ["為什麼等號兩邊同時加上同一個數，等式還是成立？"], "expect": {"sources_include": ["1-2-1"]}}
-{"id": "ret-006", "tier": "paraphrase", "turns": ["移項時，加號的項移到另一邊會變成什麼？"], "expect": {"sources_include": ["1-3-1"]}}
-{"id": "ret-007", "tier": "example", "turns": ["5x − 3 = 2x + 9 要怎麼解？"], "expect": {"sources_include": ["1-3-4"]}}
-{"id": "ret-008", "tier": "paraphrase", "turns": ["解完方程式後，要怎麼確認答案對不對？"], "expect": {"sources_include": ["1-3-5"]}}
-{"id": "ret-009", "tier": "example", "turns": ["x/2 + x/3 = 10 要怎麼去分母？"], "expect": {"sources_include": ["1-4-2"]}}
-{"id": "ret-010", "tier": "hard", "turns": ["x/2 + 1 = 5 常見的錯誤寫法是什麼？"], "expect": {"sources_include": ["1-4-4"]}}
-{"id": "ret-011", "tier": "hard", "turns": ["括號前面是負號，展開時要注意什麼？"], "expect": {"sources_include": ["1-4-4", "1-4-1"]}}
-{"id": "ret-012", "tier": "paraphrase", "turns": ["小明走路和騎腳踏車去學校差 10 分鐘，怎麼求距離？"], "expect": {"sources_include": ["1-5-5"]}}
-{"id": "ret-013", "tier": "paraphrase", "turns": ["解應用問題通常分哪幾個步驟？"], "expect": {"sources_include": ["1-5-1"]}}
-{"id": "ret-014", "tier": "hard", "turns": ["籠子裡雞和兔子共 20 隻、腳共 56 隻，兔子有幾隻？"], "expect": {"sources_include": ["1-5-4"]}}
-{"id": "ret-015", "tier": "multi", "turns": ["為什麼移項要變號？跟等量公理有什麼關係？"], "expect": {"sources_include": ["1-3-1", "1-2-1"]}}
-{"id": "ret-016", "tier": "colloquial", "turns": ["方程式 3x = 18，那個 3 要搬到另一邊該怎麼辦？"], "expect": {"sources_include": ["1-3-2"]}}
-{"id": "ret-017", "tier": "colloquial", "turns": ["文具店買東西，筆記本比筆貴 25 元，三枝筆加一本筆記本付了 85 元，一枝筆多少錢？"], "expect": {"sources_include": ["1-5-3"]}}
-{"id": "ret-018", "tier": "colloquial", "turns": ["爸爸 40 歲、小孩 12 歲，過幾年爸爸的年紀會是小孩的兩倍？"], "expect": {"sources_include": ["1-5-2"]}}
-{"id": "ret-019", "tier": "confusable", "turns": ["x + y = 10 為什麼不是一元一次方程式？"], "expect": {"sources_include": ["1-1-3"]}}
-{"id": "ret-020", "tier": "confusable", "turns": ["x = 4 是 3x + 5 = 20 的解嗎？"], "expect": {"sources_include": ["1-1-4"]}}
-{"id": "ret-021", "tier": "confusable", "turns": ["3x + 5 = 20 的解題步驟是什麼？"], "expect": {"sources_include": ["1-3-3"]}}
-{"id": "ret-022", "tier": "confusable", "turns": ["x ÷ 4 = 2 要怎麼解？"], "expect": {"sources_include": ["1-2-3", "1-3-2"]}}
-{"id": "ret-023", "tier": "colloquial", "turns": ["某個數的 3 倍再加 5，要怎麼用符號寫？"], "expect": {"sources_include": ["1-1-1"]}}
-{"id": "ret-024", "tier": "colloquial", "turns": ["為什麼等號兩邊不能同時除以 0？"], "expect": {"sources_include": ["1-2-2"]}}
-{"id": "ret-025", "tier": "confusable", "turns": ["分數方程式去完分母之後，括號還要展開嗎？"], "expect": {"sources_include": ["1-4-3"]}}
-{"id": "ret-026", "tier": "multi", "turns": ["年齡問題列出方程式之後，要怎麼檢查答案合不合理？"], "expect": {"sources_include": ["1-5-2", "1-5-1"]}}
-{"id": "ret-027", "tier": "multi", "turns": ["有括號的方程式和有分數的方程式，處理方式有什麼不同？"], "expect": {"sources_include": ["1-4-1", "1-4-2"]}}
+{"id": "my-001", "tier": "in_scope", "turns": ["幫我出 4 題一元一次方程式定義的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 4, "sources_include": ["1-1-2", "1-1-3"]}}
+{"id": "my-002", "tier": "in_scope", "turns": ["出 5 題判斷是不是一元一次方程式的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 5, "sources_include": ["1-1-3"]}}
+{"id": "my-003", "tier": "in_scope", "turns": ["出 3 題等量公理的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-2-1", "1-2-2"]}}
+{"id": "my-004", "tier": "in_scope", "turns": ["出 2 題檢查學生知不知道不能除以 0 的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 2, "sources_include": ["1-2-2"]}}
+{"id": "my-005", "tier": "in_scope", "turns": ["針對移項出 3 題選擇題，要包含加減互換"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-3-1", "1-3-3", "1-3-4"]}}
+{"id": "my-006", "tier": "in_scope", "turns": ["幫我出 3 題未知數在等號兩邊的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-3-4"]}}
+{"id": "my-007", "tier": "in_scope", "turns": ["出 2 題考驗算的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 2, "sources_include": ["1-3-5"]}}
+{"id": "my-008", "tier": "in_scope", "turns": ["出 3 題像 3(x+2)-2(x-1)=15 這種含括號的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-4-1"]}}
+{"id": "my-009", "tier": "in_scope", "turns": ["針對去分母出 2 題選擇題，分母要不一樣"], "expect": {"guardrail.action": "pass", "questions_count": 2, "sources_include": ["1-4-2", "1-4-3"]}}
+{"id": "my-010", "tier": "in_scope", "turns": ["根據講義的常見錯誤，出 3 題能抓出學生漏乘常數項的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-4-4"]}}
+{"id": "my-011", "tier": "in_scope", "turns": ["出 3 題年齡問題的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-5-2"]}}
+{"id": "my-012", "tier": "in_scope", "turns": ["出 2 題價格問題的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 2, "sources_include": ["1-5-3"]}}
+{"id": "my-013", "tier": "in_scope", "turns": ["幫我出 3 題雞兔同籠或行程問題的選擇題"], "expect": {"guardrail.action": "pass", "questions_count": 3, "sources_include": ["1-5-4", "1-5-5"]}}
+{"id": "my-014", "tier": "in_scope", "turns": ["幫我出一份 5 題的小考，涵蓋移項和去括號"], "expect": {"guardrail.action": "pass", "questions_count": 5, "sources_include": ["1-3-1", "1-3-3", "1-3-4", "1-4-1"]}}
+{"id": "my-015", "tier": "summary", "turns": ["幫我摘要 1-2 節的重點"], "expect": {"guardrail.action": "pass", "sources_include": ["1-2-1", "1-2-2", "1-2-3"]}}
+{"id": "my-016", "tier": "summary", "turns": ["幫我摘要 1-5 節的重點"], "expect": {"guardrail.action": "pass", "sources_include": ["1-5-1", "1-5-2", "1-5-3", "1-5-4", "1-5-5"]}}
+{"id": "my-017", "tier": "summary", "turns": ["整理移項法則的重點，給學生複習用"], "expect": {"guardrail.action": "pass", "sources_include": ["1-3-1", "1-3-2"]}}
+{"id": "my-018", "tier": "summary", "turns": ["把解應用問題的步驟整理成口訣，給學生背"], "expect": {"guardrail.action": "pass", "sources_include": ["1-5-1"]}}
+{"id": "my-019", "tier": "summary", "turns": ["學生去分母時常犯哪些錯？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-4-4"]}}
+{"id": "my-020", "tier": "summary", "turns": ["整理方程式、未知數和解的基本名詞"], "expect": {"guardrail.action": "pass", "sources_include": ["1-1-1", "1-1-2", "1-1-4"]}}
+{"id": "my-021", "tier": "summary", "turns": ["摘要含括號與含分數的方程式怎麼解"], "expect": {"guardrail.action": "pass", "sources_include": ["1-4-1", "1-4-2", "1-4-3"]}}
+{"id": "my-022", "tier": "summary", "turns": ["整理驗算怎麼做，以及為什麼要驗算"], "expect": {"guardrail.action": "pass", "sources_include": ["1-3-5"]}}
+{"id": "my-023", "tier": "teaching", "turns": ["學生問我為什麼移項要變號，講義怎麼解釋？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-3-1", "1-2-1"]}}
+{"id": "my-024", "tier": "teaching", "turns": ["我想用天平的比喻向學生解釋等式，講義有這段嗎？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-2-1"]}}
+{"id": "my-025", "tier": "teaching", "turns": ["學生問 5 + 3 = 8 為什麼不是方程式，講義怎麼說？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-1-2"]}}
+{"id": "my-026", "tier": "teaching", "turns": ["我需要一個未知數在等號兩邊的課堂示範例題"], "expect": {"guardrail.action": "pass", "sources_include": ["1-3-4"]}}
+{"id": "my-027", "tier": "teaching", "turns": ["哪個例題適合用來示範等量公理解方程式？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-2-3"]}}
+{"id": "my-028", "tier": "teaching", "turns": ["雞兔同籠要怎麼教學生設未知數、列式？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-5-4"]}}
+{"id": "my-029", "tier": "teaching", "turns": ["括號前面是負號，學生展開時常犯什麼錯？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-4-4"]}}
+{"id": "my-030", "tier": "teaching", "turns": ["行程問題要怎麼教學生列式？"], "expect": {"guardrail.action": "pass", "sources_include": ["1-5-5"]}}
