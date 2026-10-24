@@ -63,11 +63,11 @@ uv run python scripts/show_chunks.py -v                    # 印出切塊結果�
 ### 設定放哪裡
 
 
-| 設定                     | 放哪裡                                   | 例子                           |
-| -------------------------- | ------------------------------------------ | -------------------------------- |
+| 設定                     | 放哪裡                                   | 例子                                  |
+| -------------------------- | ------------------------------------------ | --------------------------------------- |
 | 每個人都該一致、影響結果 | `config.py` 預設值（commit）             | `TOP_K`、`RAG_VERSION`、`EMBED_MODEL` |
-| 只有 Docker 裡才不同     | `docker-compose.yml` 的 `environment`    | `OLLAMA_URL`、`DATA_DIR`       |
-| 祕密或個人偏好           | `.env`（不 commit，範本 `.env.example`） | `CLOUD_API_KEY`、`LOCAL_MODEL` |
+| 只有 Docker 裡才不同     | `docker-compose.yml` 的 `environment`    | `OLLAMA_URL`、`DATA_DIR`              |
+| 祕密或個人偏好           | `.env`（不 commit，範本 `.env.example`） | `CLOUD_API_KEY`、`LOCAL_MODEL`        |
 
 `uv run` 不會自動讀 `.env`，要用時加 `--env-file .env`。換地端模型要先 `ollama pull`，驗收機也要有，並寫進 README。
 
@@ -153,8 +153,8 @@ flowchart TD
 - [X]  5. 改良版 B（更換切塊、混合檢索或重排序），用數據比較
 - [X]  6. 至少一個教師情境完整可用（摘要或教材問答）
 - [X]  7. 失敗案例 ≥ 2 個、跑 `tests/teacher.jsonl` 並附輸出、`docs/midterm-report.md`（含 AI 使用揭露）
-- [ ]  8. README 註明模型（含嵌入模型，已完成）；`docker compose up --build` 完整驗證（繳交前最後再跑一次）
-- [ ]  9. `git tag midterm && git push origin midterm`，填繳交表
+- [X]  8. README 註明模型（含嵌入模型）；`docker compose up --build` 驗證（已於 `551d4f4` 驗證，並由作者在瀏覽器確認 UI；合併進 `main` 後須再驗證一次）
+- [ ]  9. 合併進 `main` 後重跑一次 Docker 驗證，再 `git tag midterm && git push origin refs/tags/midterm`，填繳交表（流程見第 8 節）
 
 不在期中範圍：護欄（`guardrail` 欄位需存在，可固定 `pass`）、Fact Critic、Agent。
 
@@ -193,7 +193,7 @@ docker compose down
 
   所以要持久化寫入時，用**具名 volume，不要 bind mount 主機資料夾**。
 
-- 驗證狀態：2026-10-24 已用 `docker compose up --build` 驗證含 RAG 的版本（`/health`、ui 回 200、`POST /chat` 經容器內 api 呼叫主機 Ollama 的 `bge-m3` 嵌入與 `qwen2.5:3b`、依節號取整節、容器內 `RAG_VERSION=B` 檢索，執行身分 uid 999）。索引在第一次請求時才建，不影響 `start_period`。之後若改了程式或依賴，繳交前須再驗證一次。
+- 驗證狀態：2026-10-24，commit `551d4f4`，用 `docker compose up --build` 驗證：`/health`、`POST /chat` 經容器內 api 呼叫主機 Ollama 的 `bge-m3` 嵌入與 `qwen2.5:3b`、依節號取整節、容器內 `RAG_VERSION` 可由 `.env` 切換、公開題 `tests/teacher.jsonl`（3/12）、執行身分 uid 999；ui 以 Streamlit `AppTest` 在容器內跑過一輪對話（四個後台展開欄都出現），作者另在瀏覽器確認畫面。索引在第一次請求時才建，不影響 `start_period`。與組員的分支整合後、或改了程式與依賴，繳交前須再驗證一次。
 
 ## 7. 已知問題與期末待辦
 
