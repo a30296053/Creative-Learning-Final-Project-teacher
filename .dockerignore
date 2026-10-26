@@ -1,0 +1,9 @@
+# build context 是整個 repo，排除不需要送進 Docker 的東西（也避免 .env 被送進去）
+.git
+.venv
+.env
+**/__pycache__
+data
+tests
+docs
+spec
