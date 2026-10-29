@@ -2,7 +2,7 @@
 
 - 組別角色：教師 AI 助教
 - 組員：
-  - 王文和（學號 115522069）
+  - 王文和（學號 115522069，GitHub：wangwenho）
   - 林祐任（學號 115522054，GitHub：a30296053）
 - 繳交 commit：以 `midterm` tag 指向的 commit 為準（報告本身包含在該 commit 內，無法寫入自己的 commit hash）
 
