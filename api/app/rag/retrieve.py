@@ -13,8 +13,10 @@ from ..config import RAG_VERSION, TOP_K
 from .chunking import Chunk
 from .index import embed, get_index, tokenize
 
-# 「摘要 1-3 節」這類明確的節號：切塊內容裡沒有節標題可比對，直接依段落 id 前綴取整節
-_SECTION_REF = re.compile(r"(?<![\d-])(\d+-\d+)\s*節")
+# 「摘要 1-3 節」這類明確的節號：切塊內容裡沒有節標題可比對，直接依段落 id 前綴取整節。
+# 單位詞（節、章、小節、單元、部分）與分隔符號（- – — .）容許常見的口語說法；
+# 後面緊接 -數字（如「1-3-2 節」）是單一段落的 id，不是節號。沒寫單位的「1-4」不處理，避免把算式當節號。
+_SECTION_REF = re.compile(r"(?<![\d-])(\d+)\s*[-–—.]\s*(\d+)(?![\d-])\s*(?:小節|節|章|單元|部分)")
 
 RRF_K = 60  # RRF 的常用常數；越大，名次差異的影響越小
 
@@ -56,5 +58,5 @@ def section_chunks(query: str) -> list[Chunk]:
     m = _SECTION_REF.search(query)
     if not m:
         return []
-    prefix = m.group(1) + "-"
+    prefix = f"{int(m.group(1))}-{int(m.group(2))}-"  # int() 順便把全形數字與前導 0 正規化
     return [c for c in get_index().chunks if c.id.startswith(prefix)]

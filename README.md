@@ -133,7 +133,8 @@ uv run streamlit run ui/app.py
 ├── scripts/
 │   ├── run_tests.py        # 測試程式
 │   ├── eval_retrieval.py   # 只測檢索命中率（教師組）
-│   └── show_chunks.py      # 印出切塊結果（教師組）
+│   ├── show_chunks.py      # 印出切塊結果（教師組）
+│   └── test_section_ref.py # 測「N-N 節」整節取用的規則（教師組）
 ├── docker-compose.yml
 └── .env.example
 ```
