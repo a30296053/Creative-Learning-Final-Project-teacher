@@ -43,6 +43,7 @@ uv run python scripts/run_tests.py tests/teacher.jsonl     # 助教公開題；�
 uv run python scripts/run_tests.py tests/my_tests.jsonl    # 自訂 30 題，同樣含出題與範圍外題，那兩類在期末功能完成前會失敗
 uv run python scripts/eval_retrieval.py --version B        # 只測檢索命中率（不經 LLM、不需啟動 api），--version A|B、--k N
 uv run python scripts/show_chunks.py -v                    # 印出切塊結果，確認段落 id 切得對
+uv run python scripts/test_section_ref.py                  # 檢查「N-N 節」整節取用的規則認得哪些說法（不需 Ollama）
 ```
 
 切換檢索版本：`RAG_VERSION=A uv run uvicorn api.app.main:app --reload`（預設 B）。環境變數可直接寫在指令前；Docker 則在 `.env` 加一行 `RAG_VERSION=A`。
@@ -93,7 +94,7 @@ uv run python scripts/show_chunks.py -v                    # 印出切塊結果�
 ├── ui/{Dockerfile, app.py}
 ├── data/                  # 助教教材（容器內為唯讀的 /data）
 ├── tests/                 # teacher.jsonl（助教公開題）、my_tests.jsonl（自訂 30 題）
-├── scripts/               # run_tests.py（打 /chat）、eval_retrieval.py（只測檢索）、show_chunks.py
+├── scripts/               # run_tests.py（打 /chat）、eval_retrieval.py（只測檢索）、show_chunks.py、test_section_ref.py
 ├── spec/                  # 助教規格
 └── docs/{dev-note.md, midterm-report.md}
 ```
