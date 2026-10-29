@@ -147,7 +147,7 @@ teacher-012 的修正是在看到失敗之後才做的，所以我們比較了�
 
 ## 6. 公開測試題結果
 
-執行環境：2026-10-24，`docker compose up --build` 啟動，commit `801a37a`，預設設定（`RAG_VERSION=B`、K = 3、`bge-m3`、`qwen2.5:3b`）。指令與輸出：
+執行環境：2026-10-29 重跑，`docker compose up --build` 啟動，commit `83ecf82`（含標註修訂與整節取用規則的修改），預設設定（`RAG_VERSION=B`、K = 3、`bge-m3`、`qwen2.5:3b`）。指令與輸出：
 
 ```
 uv run python scripts/run_tests.py tests/teacher.jsonl
@@ -187,6 +187,10 @@ PASS  teacher-012
   summary        3/3
   總計           3/12
 ```
+
+與 2026-10-24（commit `801a37a`）的結果逐題相同，3/12。同一份環境另跑了 `tests/my_tests.jsonl`（30 題）：in_scope 1/12、out_of_scope 0/6、summary 8/8、teaching 4/4，總計 13/30。in_scope 的 1 題是 my-010，它的題目沒有指定題數（「出幾題」），所以只檢查來源與護欄欄位就過了，不代表出題功能可用；同樣，出題與護欄未實作，其餘 17 題的失敗原因與公開題相同。另外，`POST /chat`「我要1-2章的摘要」在容器內回傳 `sources` 為 1-2-1、1-2-2、1-2-3（整節取用規則生效）。
+
+這次沒有重做的驗證：10 分鐘內可用的計時（映像層有快取，從 `docker compose up -d --build` 到 api healthy 約 15 秒，不能代表全新環境），以及 ui 的畫面。
 
 主要的失敗原因：
 - **`in_scope` 0/5（teacher-001～005）：** 出題功能尚未實作，回傳的 `questions` 是空的，所以題數不符。出題與 Fact Critic 不在期中範圍。

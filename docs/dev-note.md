@@ -194,7 +194,8 @@ docker compose down
 
   所以要持久化寫入時，用**具名 volume，不要 bind mount 主機資料夾**。
 
-- 驗證狀態：2026-10-24，commit `551d4f4`，用 `docker compose up --build` 驗證：`/health`、`POST /chat` 經容器內 api 呼叫主機 Ollama 的 `bge-m3` 嵌入與 `qwen2.5:3b`、依節號取整節、容器內 `RAG_VERSION` 可由 `.env` 切換、公開題 `tests/teacher.jsonl`（3/12）、執行身分 uid 999；ui 以 Streamlit `AppTest` 在容器內跑過一輪對話（四個後台展開欄都出現），作者另在瀏覽器確認畫面。索引在第一次請求時才建，不影響 `start_period`。與組員的分支整合後、或改了程式與依賴，繳交前須再驗證一次。
+- 驗證狀態：2026-10-29 以 commit `83ecf82` 用 `docker compose up --build` 重跑 api：`/health`、`tests/teacher.jsonl`（3/12）、`tests/my_tests.jsonl`（13/30，與本機逐題相同）、「我要1-2章的摘要」取得 1-2 節整節；這次沒有重驗 ui、冷啟動時間，也沒有與組員分支整合後的狀態。下一行是 2026-10-24（commit `551d4f4`）的完整驗證：
+- 2026-10-24，commit `551d4f4`，用 `docker compose up --build` 驗證：`/health`、`POST /chat` 經容器內 api 呼叫主機 Ollama 的 `bge-m3` 嵌入與 `qwen2.5:3b`、依節號取整節、容器內 `RAG_VERSION` 可由 `.env` 切換、公開題 `tests/teacher.jsonl`（3/12）、執行身分 uid 999；ui 以 Streamlit `AppTest` 在容器內跑過一輪對話（四個後台展開欄都出現），作者另在瀏覽器確認畫面。索引在第一次請求時才建，不影響 `start_period`。與組員的分支整合後、或改了程式與依賴，繳交前須再驗證一次。
 
 ## 7. 已知問題與期末待辦
 
