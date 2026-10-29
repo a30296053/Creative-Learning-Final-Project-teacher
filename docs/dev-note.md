@@ -149,13 +149,13 @@ flowchart TD
 
 - [X]  1. `rag/chunking.py` + 小腳本印出每個 chunk 的段落 id，確認切得對
 - [X]  2. `rag/index.py`、`rag/retrieve.py` 基本版 A，打通 `/chat` 並回傳 `sources[].id`
-- [X]  3. 自訂評測集 ≥ 10 題（現有 30 題，句型比照 `teacher.jsonl`；其中 24 題標有應命中的段落 id，可評檢索，6 題範圍外題留給護欄）
+- [X]  3. 自訂評測集 ≥ 10 題（現有 30 題，句型比照 `teacher.jsonl`；其中 24 題標有應命中的段落 id，可評檢索，6 題範圍外題留給護欄；10-29 經組員審閱，my-002／004／012 補標例題或講解段落，報告數字已用新標註重算）
 - [X]  4. `scripts/eval_retrieval.py`：自動算兩版 Top-K 命中率
 - [X]  5. 改良版 B（更換切塊、混合檢索或重排序），用數據比較
 - [X]  6. 至少一個教師情境完整可用（摘要或教材問答）
 - [X]  7. 失敗案例 ≥ 2 個、跑 `tests/teacher.jsonl` 並附輸出、`docs/midterm-report.md`（含 AI 使用揭露）
 - [X]  8. README 註明模型（含嵌入模型）；`docker compose up --build` 驗證（已於 `551d4f4` 驗證，並由作者在瀏覽器確認 UI；合併進 `main` 後須再驗證一次）
-- [ ]  9. 合併進 `main` 後重跑一次 Docker 驗證，再 `git tag midterm && git push origin refs/tags/midterm`，填繳交表（流程見第 8 節）
+- [ ]  9. （目前 `dev/wang` 在 PR #1 之後還有標註修訂、整節規則、重測紀錄等 commit 尚未進 `main`，須先開第二個 PR）合併進 `main` 後重跑一次 Docker 驗證，再 `git tag midterm && git push origin refs/tags/midterm`，填繳交表（流程見第 8 節）
 
 不在期中範圍：護欄（`guardrail` 欄位需存在，可固定 `pass`）、Fact Critic、Agent。
 
@@ -201,7 +201,7 @@ docker compose down
 
 - **BM25 仍會被通用詞帶偏**：`teacher-012` 曾因此在版本 B 失敗，現在用「保證向量第 1 名進入 Top-K」補救（報告第 5 節，比較過 5 種做法）。但這只是讓 1-4-4 進入 Top-3（排第 3），BM25 本身的問題沒有解決；忽略高頻詞、調降 BM25 權重都試過，會換來別題失敗。
 - **RRF 分數平手**：兩個排名互為鏡像時分數完全相同，次序由 `argsort` 決定（報告第 5 節）。可能的修法：平手時以向量相似度為第二排序鍵。
-- **「N-N 節」規則只認這一種寫法**：「第三節」「1.3 節」不會觸發，會退回一般檢索。
+- **整節取用規則只認明確節號**：認「N-N + 節／章／小節／單元／部分」（分隔符號 `- – — .`），但「整理 1-4 的重點」（無單位詞）、「移項法則那一節」（節名稱）、「第三節」「第一章」不會觸發，會退回一般檢索（報告第 5 節末有逐項原因）。根本解法是期末做意圖分類，取代規則比對。`scripts/test_section_ref.py` 可檢查認得哪些說法。
 - **3B 模型的限制**：摘要可能漏段落、偶爾補上教材沒有的推測句，prompt 要求的行內 `[id]` 引用也常被忽略。
 - **只看最後一句**：檢索只用最後一輪訊息，追問（例如「那驗算呢？」）會找不到。
 - **期末要做**：護欄（`out_of_scope`）、出題（`questions`）、Fact Critic、`llm.py` 與雲端路徑（`route`）。
@@ -211,4 +211,4 @@ docker compose down
 - 各自用自己的帳號 commit（個人貢獻依 commit 紀錄評估）；目前開發分支 `dev/wang`。
 - 規格有疑問以 `spec/` 與助教 repo 為準。
 - **期中繳交流程**：(1) 文件與程式在 `dev/wang` 定稿（報告標頭、模板 `>` 說明都處理完）；(2) 開 PR 到 `main`，組員 checkout 該 PR 的 commit，跑 `docker compose up --build` 與 `tests/teacher.jsonl` 確認；(3) 合併時用 merge commit 或 rebase，**不要 squash**，否則驗證過的 commit 不在 `main` 的歷史裡；(4) 在 `main` 最新的 commit 上打 tag：`git tag midterm && git push origin refs/tags/midterm`；(5) 驗證通過後不再加 commit，真的要改就先通知組員，再刪除並重打 tag。
-- **`midterm` 名稱衝突**：遠端目前已有一個 `midterm` **分支**（林祐任，commit `fce9294`，另一份 RAG 版本 A 實作）。分支與 tag 同名會讓 `git rev-parse midterm`、`git checkout midterm` 出現 ambiguous 警告；打 tag 前請和組員討論，把那個分支改名（例如 `dev/lin`）。該分支的 `api/app/rag.py`、`api/requirements.txt` 也與我們的 `api/app/rag/` 套件和 uv 依賴管理不相容，合併時 `pipeline.py` 會衝突，需要先處理。
+- **`midterm` 名稱衝突（已解決）**：原本遠端有一個 `midterm` **分支**（林祐任，commit `fce9294`，另一份 RAG 版本 A 實作），已改名為 `dev/lin`；2026-10-29 `git ls-remote` 確認遠端只剩 `dev/lin`、`dev/wang`、`main` 三個分支，沒有 `midterm` 分支或 tag。打 tag 前仍可再確認一次，避免分支與 tag 同名造成 `git rev-parse midterm` ambiguous。該分支的 `api/app/rag.py`、`api/requirements.txt` 也與我們的 `api/app/rag/` 套件和 uv 依賴管理不相容，合併時 `pipeline.py` 會衝突，需要先處理。
